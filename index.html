@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Juego de Adivinanzas: Puertos y Displays</title>
+    <style>
+        :root {
+            --primary: #4f46e5;
+            --primary-hover: #4338ca;
+            --bg-color: #f3f4f6;
+            --card-bg: #ffffff;
+            --text-color: #1f2937;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .container {
+            background-color: var(--card-bg);
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            max-width: 600px;
+            width: 100%;
+            text-align: center;
+        }
+
+        h1 {
+            color: var(--primary);
+            margin-bottom: 10px;
+        }
+
+        .counter {
+            font-size: 0.9rem;
+            color: #6b7280;
+            margin-bottom: 20px;
+        }
+
+        .question-box {
+            font-size: 1.2rem;
+            margin-bottom: 20px;
+            line-height: 1.5;
+            font-weight: 500;
+        }
+
+        .options {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        button.option-btn {
+            background-color: #e5e7eb;
+            border: none;
+            padding: 12px;
+            border-radius: 8px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: background-color 0.2s, transform 0.1s;
+        }
+
+        button.option-btn:hover {
+            background-color: #d1d5db;
+        }
+
+        button.option-btn.correct {
+            background-color: #10b981;
+            color: white;
+        }
+
+        button.option-btn.incorrect {
+            background-color: #ef4444;
+            color: white;
+        }
+
+        #next-btn {
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            font-size: 1rem;
+            border-radius: 8px;
+            cursor: pointer;
+            display: none;
+        }
+
+        #next-btn:hover {
+            background-color: var(--primary-hover);
+        }
+
+        .score-container {
+            font-size: 1.3rem;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container" id="game-container">
+        <h1>Adivinanzas de Hardware</h1>
+        <div class="counter" id="counter">Pregunta 1 de 10</div>
+        <div class="question-box" id="question-text">Cargando pregunta...</div>
+        <div class="options" id="options-container"></div>
+        <button id="next-btn" onclick="nextQuestion()">Siguiente Pregunta</button>
+    </div>
+
+    <script>
+        const quizData = [
+            {
+                question: "Soy un puerto de entrada/salida ultrarrápido que utiliza un conector reversible tipo C, capaz de transmitir datos, video y energía simultáneamente. ¿Quién soy?",
+                options: ["Puerto USB tipo A", "Puerto USB-C (Thunderbolt)", "Puerto Paralelo", "Puerto VGA"],
+                answer: 1
+            },
+            {
+                question: "Funcionamos como líneas de comunicación seriales de alta velocidad diseñadas principalmente para conectar tarjetas gráficas y discos NVMe directamente al procesador. ¿Qué tipo de ranura o bus somos?",
+                options: ["PCI Express (PCIe)", "Puerto Serial RS-232", "Puerto PS/2", "Bus ISA"],
+                answer: 0
+            },
+            {
+                question: "Soy un puerto clásico de entrada/salida de video analógico de 15 pines, ampliamente utilizado en monitores y proyectores antiguos. ¿Quién soy?",
+                options: ["HDMI", "VGA", "DisplayPort", "DVI"],
+                answer: 1
+            },
+            {
+                question: "Tecnología de visualización plana que utiliza cristales líquidos que bloquean o dejan pasar la luz de una matriz trasera (usualmente LED). ¿Qué tipo de display soy?",
+                options: ["Display LED", "Display LCD", "Display CRT", "Pantalla de Plasma"],
+                answer: 1
+            },
+            {
+                question: "Dispositivo de visualización compuesto por diodos emisores de luz individuales que pueden apagarse por completo, ofreciendo negros perfectos y un gran contraste. ¿Qué tipo de pantalla soy?",
+                options: ["Pantalla OLED / AMOLED", "Display LCD tradicional", "Monitor CRT", "Pantalla al vacío fluorescente"],
+                answer: 0
+            },
+            {
+                question: "Puerto de entrada/salida enfocado en la transmisión digital simultánea de video de alta definición y audio multicanal, estándar en casi todos los televisores y monitores modernos. ¿Quién soy?",
+                options: ["Puerto HDMI", "Puerto PS/2", "Puerto Serial", "Puerto VGA"],
+                answer: 0
+            },
+            {
+                question: "Somos líneas de buses tradicionales de E/S que solían conectar impresoras antiguas y transferían datos en paralelo mediante un cable ancho de 25 pines. ¿Qué puerto fuimos?",
+                options: ["Puerto Paralelo (LPT)", "Puerto USB", "Puerto Ethernet", "Puerto Audio Jack"],
+                answer: 0
+            },
+            {
+                question: "Tecnología de visualización basada en fósforo y un tubo de rayos catódicos, caracterizada por ser pesada, voluminosa y utilizada en los monitores y televisores antiguos. ¿Qué tipo de pantalla soy?",
+                options: ["Monitor CRT", "Display LCD", "Pantalla LED", "Pantalla Retina"],
+                answer: 0
+            },
+            {
+                question: "Soy un puerto de red de entrada/salida (RJ-45) encargado de conectar la computadora a una red local (LAN) o internet mediante cable. ¿Quién soy?",
+                options: ["Puerto Ethernet / LAN", "Puerto Serial", "Puerto PS/2", "Puerto DVI"],
+                answer: 0
+            },
+            {
+                question: "Tecnología de visualización avanzada que utiliza puntos cuánticos (Quantum Dots) combinados con iluminación LED para ofrecer colores mucho más vivos y brillantes. ¿Qué tipo de pantalla soy?",
+                options: ["Display QLED", "Display monocromático", "Pantalla CRT", "Display de fósforo"],
+                answer: 0
+            }
+        ];
+
+        let currentQuestionIndex = 0;
+        let score = 0;
+        let answered = false;
+
+        const questionText = document.getElementById("question-text");
+        const optionsContainer = document.getElementById("options-container");
+        const nextBtn = document.getElementById("next-btn");
+        const counter = document.getElementById("counter");
+        const gameContainer = document.getElementById("game-container");
+
+        function loadQuestion() {
+            answered = false;
+            nextBtn.style.display = "none";
+            optionsContainer.innerHTML = "";
+
+            const currentQ = quizData[currentQuestionIndex];
+            counter.innerText = `Pregunta ${currentQuestionIndex + 1} de ${quizData.length}`;
+            questionText.innerText = currentQ.question;
+
+            currentQ.options.forEach((option, index) => {
+                const button = document.createElement("button");
+                button.classList.add("option-btn");
+                button.innerText = option;
+                button.onclick = () => selectOption(index, button);
+                optionsContainer.appendChild(button);
+            });
+        }
+
+        function selectOption(selectedIndex, selectedButton) {
+            if (answered) return;
+            answered = true;
+
+            const currentQ = quizData[currentQuestionIndex];
+            const allButtons = optionsContainer.querySelectorAll(".option-btn");
+
+            if (selectedIndex === currentQ.answer) {
+                selectedButton.classList.add("correct");
+                score++;
+            } else {
+                selectedButton.classList.add("incorrect");
+                allButtons[currentQ.answer].classList.add("correct");
+            }
+
+            allButtons.forEach(btn => btn.style.cursor = "default");
+            nextBtn.style.display = "inline-block";
+        }
+
+        function nextQuestion() {
+            currentQuestionIndex++;
+            if (currentQuestionIndex < quizData.length) {
+                loadQuestion();
+            } else {
+                showResults();
+            }
+        }
+
+        function showResults() {
+            gameContainer.innerHTML = `
+                <h1>¡Juego Terminado!</h1>
+                <p class="score-container">Has acertado ${score} de ${quizData.length} preguntas.</p>
+                <p>${score === quizData.length ? "¡Perfecto! Tienes un dominio absoluto sobre puertos, buses y dispositivos de visualización." : "¡Buen trabajo! Sigue repasando los conceptos de hardware para dominar el tema al 100%."}</p>
+                <button id="next-btn" style="display:inline-block;" onclick="location.reload()">Jugar de nuevo</button>
+            `;
+        }
+
+        window.onload = loadQuestion;
+    </script>
+</body>
+</html>
